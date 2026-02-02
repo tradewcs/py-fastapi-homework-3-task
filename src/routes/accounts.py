@@ -30,7 +30,7 @@ from security.passwords import hash_password, verify_password
 from security.interfaces import JWTAuthManagerInterface
 from config.settings import BaseAppSettings
 
-router = APIRouter(prefix="/api/v1/accounts", tags=["Accounts"])
+router = APIRouter(prefix="", tags=["Accounts"])
 
 
 @router.post("/register/", response_model=UserRegistrationResponseSchema, status_code=status.HTTP_201_CREATED)
