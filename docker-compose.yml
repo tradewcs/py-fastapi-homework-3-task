@@ -7,8 +7,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres_theater_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:Z
+      - postgres_theater_data:/var/lib/postgresql:Z
     networks:
       - theater_network
     healthcheck:
@@ -29,7 +29,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - pgadmin_theater_data:/var/lib/pgadmin
+      - pgadmin_theater_data:/var/lib/pgadmin:Z
     networks:
       - theater_network
 
@@ -50,19 +50,20 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./src:/usr/src/fastapi
+      - ./src:/usr/src/fastapi:Z
     networks:
       - theater_network
 
   migrator:
     build: .
     container_name: alembic_migrator_theater
+    user: root
     command: ["/bin/bash", "/commands/run_migration.sh"]
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - ./src:/usr/src/fastapi
+      - ./src:/usr/src/fastapi:Z
     env_file:
       - .env
     environment:
