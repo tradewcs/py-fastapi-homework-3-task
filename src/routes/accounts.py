@@ -35,7 +35,11 @@ from schemas import (
     TokenRefreshResponseSchema
 )
 
-from src.exceptions.security import TokenExpiredError, InvalidTokenError
+from exceptions.security import TokenExpiredError, InvalidTokenError
+from database.validators.accounts import (
+    validate_password_strength,
+    validate_email
+)
 
 router = APIRouter()
 
@@ -74,6 +78,9 @@ async def register_user(
                 detail="An error occurred during user creation."
             )
         try:
+            validate_email(user_data.email)
+            validate_password_strength(user_data.password)
+
             new_user = UserModel.create(
                 email=user_data.email,
                 raw_password=user_data.password,
