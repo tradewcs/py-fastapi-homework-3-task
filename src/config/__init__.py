@@ -16,4 +16,3 @@ else:
         get_postgresql_db_contextmanager as get_db_contextmanager,
         get_postgresql_db as get_db
     )
-
