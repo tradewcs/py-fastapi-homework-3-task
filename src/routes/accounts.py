@@ -59,15 +59,16 @@ async def register_user(
         user_data: UserRegistrationRequestSchema,
         db: Annotated[AsyncSession, Depends(get_db)]
 ) -> UserRegistrationResponseSchema:
-    existing_user = await db.scalar(
-        select(UserModel).where(UserModel.email == user_data.email)
-    )
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"A user with this email {user_data.email} already exists.",
-        )
     try:
+        existing_user = await db.scalar(
+            select(UserModel).where(UserModel.email == user_data.email)
+        )
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"A user with this email {user_data.email} already exists.",
+            )
+
         group = await db.scalar(
             select(UserGroupModel).where(
                 UserGroupModel.name == UserGroupEnum.USER)
@@ -76,21 +77,17 @@ async def register_user(
             raise HTTPException(
                 status_code=500,
                 detail="An error occurred during user creation."
-            )
-        try:
-            validate_email(user_data.email)
-            validate_password_strength(user_data.password)
+           )
 
-            new_user = UserModel.create(
-                email=user_data.email,
-                raw_password=user_data.password,
-                group_id=group.id
-            )
-        except ValueError as e:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=str(e)
-            )
+        validate_email(user_data.email)
+        validate_password_strength(user_data.password)
+
+        new_user = UserModel.create(
+            email=user_data.email,
+            raw_password=user_data.password,
+            group_id=group.id
+        )
+
         db.add(new_user)
         await db.flush()
         activation_token = ActivationTokenModel(user_id=new_user.id)
@@ -100,6 +97,12 @@ async def register_user(
         return UserRegistrationResponseSchema(
             id=new_user.id,
             email=new_user.email,
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e)
         )
     except SQLAlchemyError:
         await db.rollback()

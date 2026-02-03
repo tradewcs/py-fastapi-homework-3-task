@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 class UserRegistrationRequestSchema(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str
 
 
 class UserRegistrationResponseSchema(BaseModel):
@@ -27,7 +27,7 @@ class PasswordResetRequestSchema(BaseModel):
 class PasswordResetCompleteRequestSchema(BaseModel):
     email: EmailStr
     token: str
-    password: str = Field(min_length=8)
+    password: str
 
 
 class UserLoginRequestSchema(BaseModel):
