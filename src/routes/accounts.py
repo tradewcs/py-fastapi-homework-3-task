@@ -77,7 +77,7 @@ async def register_user(
             raise HTTPException(
                 status_code=500,
                 detail="An error occurred during user creation."
-           )
+            )
 
         validate_email(user_data.email)
         validate_password_strength(user_data.password)
