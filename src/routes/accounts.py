@@ -202,10 +202,6 @@ async def request_password_reset(
 
     except Exception:
         await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred during password reset request."
-        )
 
     return success_message
 
